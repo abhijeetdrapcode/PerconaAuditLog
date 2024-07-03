@@ -23,7 +23,7 @@ function refreshData() {
 }
 refreshData();
 
-cron.schedule('* * * * *', refreshData);
+cron.schedule('*/5 * * * *', refreshData);
 
 app.get('/', (req, res) => {
   res.json(jsonObjects);

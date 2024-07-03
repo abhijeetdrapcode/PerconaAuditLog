@@ -25,7 +25,7 @@ const logSchema = new mongoose.Schema({
   },
   users: [{ type: mongoose.Schema.Types.Mixed }],
   roles: [{ type: mongoose.Schema.Types.Mixed }],
-  param: {
+  database_collectionName: {
     ns: { type: String },
   },
   result: { type: Number },

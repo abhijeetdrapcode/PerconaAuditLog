@@ -25,7 +25,7 @@ const AuditLogController = (() => {
 
   const saveLogs = async (logs) => {
 
-    console.log('Attempting to save logs:', JSON.stringify(logs, null, 2));
+    console.log('Log Data:', JSON.stringify(logs, null, 2));
     try {
       const formattedLogs = logs.map(log => ({
         atype: log.atype,
