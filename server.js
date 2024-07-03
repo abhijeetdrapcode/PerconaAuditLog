@@ -5,7 +5,7 @@ const fs = require('fs');
 const cron = require('node-cron');
 const mongoose = require('./config/mongoose');
 const auditLogController = require('./controllers/LogDataController'); 
-const port = process.env.PORT;
+const port = process.env.PORT ||3000;
 const path = process.env.LOG_PATH;
 
 let jsonObjects = [];

@@ -1,24 +1,36 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const logSchema = new mongoose.Schema({
-  atype: { type: String, required: true },
-  timestamp: { type: Date, required: true },
+  atype: {
+    type: String,
+  },
+  timestamp: {
+    type: Date,
+  },
   local: {
-    ip: { type: String, required: true },
-    port: { type: Number, required: true }
+    ip: {
+      type: String,
+    },
+    port: {
+      type: Number,
+    },
   },
   remote: {
-    ip: { type: String, required: true },
-    port: { type: Number, required: true }
+    ip: {
+      type: String,
+    },
+    port: {
+      type: Number,
+    },
   },
-  users: [{ type: mongoose.Schema.Types.Mixed, required: true }],
-  roles: [{ type: mongoose.Schema.Types.Mixed, required: true }],
+  users: [{ type: mongoose.Schema.Types.Mixed }],
+  roles: [{ type: mongoose.Schema.Types.Mixed }],
   param: {
-    ns: { type: String, required: true }
+    ns: { type: String },
   },
-  result: { type: Number, required: true }
+  result: { type: Number },
 });
 
-const AuditLog = mongoose.model('AuditLog', logSchema);
+const AuditLog = mongoose.model("AuditLog", logSchema);
 
 module.exports = AuditLog;
