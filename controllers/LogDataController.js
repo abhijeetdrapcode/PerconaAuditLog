@@ -1,7 +1,7 @@
 const AuditLog = require('../models/LogDataModel');
 
 const AuditLogController = (() => {
-  let lastProcessedTimestamp = new Date(Date.now() - 5 * 60 * 1000); 
+  let lastProcessedTimestamp = new Date(Date.now() - 5 * 60 * 1000);
 
   const processAndSaveNewLogs = async (jsonObjects) => {
     try {
@@ -26,20 +26,20 @@ const AuditLogController = (() => {
   const saveLogs = async (logs) => {
     console.log('Log Data:', JSON.stringify(logs, null, 2));
     try {
-      const formattedLogs = logs.map(log => ({
-        atype: log.atype,
-        ts: new Date(log.ts.$date),
-        local: log.local,
-        remote: log.remote,
-        users: log.users,
-        roles: log.roles,
-        param: {
-          command: log.param.command,
-          ns: log.param.ns,
-          args: log.param.args
-        },
-        result: log.result
-      }));
+      const formattedLogs = logs.map(log => {
+        const [dbName, collectionName] = log.param.ns.split('.');
+        return {
+          collectionName: collectionName,
+          operation: log.param.command,
+          username: log.users.length > 0 ? log.users[0].user : 'Unknown',
+          parameter: {
+            command: log.param.command,
+            ns: log.param.ns
+          },
+          argument: log.param.args,
+          timestamp: new Date(log.ts.$date)
+        };
+      });
 
       await AuditLog.insertMany(formattedLogs);
       console.log('Logs saved successfully');
