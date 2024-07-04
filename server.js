@@ -9,6 +9,7 @@ const port = process.env.PORT ||3000;
 const path = process.env.LOG_PATH;
 
 let jsonObjects = [];
+
 function refreshData() {
   try {
     const fileContent = fs.readFileSync(path, 'utf8');
@@ -23,12 +24,11 @@ function refreshData() {
 }
 refreshData();
 
-cron.schedule('*/5 * * * *', refreshData);
+cron.schedule('* * * * *', refreshData);
 
 app.get('/', (req, res) => {
   res.json(jsonObjects);
 });
-
 app.listen(port, () => {
   console.log(`Server is running on localhost:${port}`);
 });

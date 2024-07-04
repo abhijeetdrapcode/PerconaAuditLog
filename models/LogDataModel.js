@@ -1,34 +1,47 @@
 const mongoose = require("mongoose");
 
 const logSchema = new mongoose.Schema({
-  atype: {
-    type: String,
-  },
-  timestamp: {
-    type: Date,
-  },
+  atype: String,
+  ts: Date,
   local: {
-    ip: {
-      type: String,
-    },
-    port: {
-      type: Number,
-    },
+    ip: String,
+    port: Number
   },
   remote: {
-    ip: {
-      type: String,
-    },
-    port: {
-      type: Number,
-    },
+    ip: String,
+    port: Number
   },
-  users: [{ type: mongoose.Schema.Types.Mixed }],
-  roles: [{ type: mongoose.Schema.Types.Mixed }],
-  database_collectionName: {
-    ns: { type: String },
+  users: [{
+    user: String,
+    db: String
+  }],
+  roles: [{
+    role: String,
+    db: String
+  }],
+  param: {
+    command: String,
+    ns: String,
+    args: {
+      insert: String,
+      documents: [{
+        name: String,
+        age: Number,
+        _id: {
+          $oid: String
+        }
+      }],
+      ordered: Boolean,
+      lsid: {
+        id: {
+          $binary: String,
+          $type: String
+        }
+      },
+      $db: String
+    }
   },
-  result: { type: Number },
+  result: Number
 });
 
 const AuditLog = mongoose.model("AuditLog", logSchema);

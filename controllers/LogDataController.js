@@ -24,17 +24,20 @@ const AuditLogController = (() => {
   };
 
   const saveLogs = async (logs) => {
-
     console.log('Log Data:', JSON.stringify(logs, null, 2));
     try {
       const formattedLogs = logs.map(log => ({
         atype: log.atype,
-        timestamp: new Date(log.ts.$date),
+        ts: new Date(log.ts.$date),
         local: log.local,
         remote: log.remote,
         users: log.users,
         roles: log.roles,
-        param: log.param,
+        param: {
+          command: log.param.command,
+          ns: log.param.ns,
+          args: log.param.args
+        },
         result: log.result
       }));
 
