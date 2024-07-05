@@ -24,27 +24,49 @@ const AuditLogController = (() => {
   };
 
   const saveLogs = async (logs) => {
-    console.log('Log Data:', JSON.stringify(logs, null, 2));
     try {
-      const formattedLogs = logs.map(log => {
-        const [dbName, collectionName] = log.param.ns.split('.');
-        return {
-          collectionName: collectionName,
-          operation: log.param.command,
-          username: log.users.length > 0 ? log.users[0].user : 'Unknown',
-          parameter: {
-            command: log.param.command,
-            ns: log.param.ns
-          },
-          argument: log.param.args,
-          timestamp: new Date(log.ts.$date)
-        };
-      });
-
+      console.log(logs);
+      const formattedLogs = logs.map(formatLog);
+      console.log(formattedLogs);
       await AuditLog.insertMany(formattedLogs);
       console.log('Logs saved successfully');
     } catch (error) {
       console.error('Error saving logs to database:', error);
+    }
+  };
+
+  const formatLog = (log) => {
+    const [databaseName, collectionName] = log.param.ns.split('.');
+    const operation = log.param.command;
+    const username = log.users.length > 0 ? log.users[0].user : 'Unknown';
+    const timestamp = new Date(log.ts.$date);
+    const details = formatDetails(operation, log.param.args);
+
+    return { databaseName, collectionName, operation, username, timestamp, ...details };
+  };
+
+  const formatDetails = (operation, args) => {
+    switch (operation) {
+      case 'insert':
+        return {
+          insertedDocuments: args.documents.map(doc => {
+            const { _id, ...rest } = doc;
+            return { ...rest, _id: _id.$oid };
+          })
+        };
+      case 'update':
+        return {
+          updateQuery: args.updates[0].q,
+          updateOperations: args.updates[0].u,
+          multi: args.updates[0].multi
+        };
+      case 'delete':
+        return {
+          deleteQuery: args.deletes[0].q,
+          deleteLimit: args.deletes[0].limit
+        };
+      default:
+        return { operationDetails: args };
     }
   };
 
