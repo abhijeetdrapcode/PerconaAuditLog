@@ -36,34 +36,39 @@ const AuditLogController = (() => {
   };
 
   const formatLog = (log) => {
-    const [databaseName, collectionName] = log.param.ns.split('.');
-    const operation = log.param.command;
-    const username = log.users.length > 0 ? log.users[0].user : 'Unknown';
-    const timestamp = new Date(log.ts.$date);
-    const details = formatDetails(operation, log.param.args);
+    const [databaseName, collectionName] = log.param && log.param.ns ? log.param.ns.split('.') : ['Unknown', 'Unknown'];
+    const operation = log.param ? log.param.command : 'Unknown';
+    const username = log.users && log.users.length > 0 ? log.users[0].user : 'Unknown';
+    const timestamp = log.ts && log.ts.$date ? new Date(log.ts.$date) : new Date();
+    const details = formatDetails(operation, log.param ? log.param.args : undefined);
 
-    return { databaseName, collectionName, operation, username, timestamp, ...details };
+    return { databaseName, collectionName, operation, username, details, timestamp };
   };
 
   const formatDetails = (operation, args) => {
+    if (!args) return { operationDetails: 'No details available' };
+
     switch (operation) {
       case 'insert':
+        if (!args.documents) return { documents: [] };
         return {
-          insertedDocuments: args.documents.map(doc => {
-            const { _id, ...rest } = doc;
-            return { ...rest, _id: _id.$oid };
-          })
+          documents: args.documents.map(doc => ({
+            ...doc,
+            _id: doc._id && doc._id.$oid ? doc._id.$oid : doc._id
+          }))
         };
       case 'update':
+        if (!args.updates || !args.updates[0]) return { query: {}, update: {}, multi: false };
         return {
-          updateQuery: args.updates[0].q,
-          updateOperations: args.updates[0].u,
-          multi: args.updates[0].multi
+          query: args.updates[0].q || {},
+          update: args.updates[0].u || {},
+          multi: args.updates[0].multi || false
         };
       case 'delete':
+        if (!args.deletes || !args.deletes[0]) return { query: {}, limit: 0 };
         return {
-          deleteQuery: args.deletes[0].q,
-          deleteLimit: args.deletes[0].limit
+          query: args.deletes[0].q || {},
+          limit: args.deletes[0].limit || 0
         };
       default:
         return { operationDetails: args };
