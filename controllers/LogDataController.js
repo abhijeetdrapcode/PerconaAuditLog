@@ -25,7 +25,7 @@ const AuditLogController = (() => {
 
   const saveLogs = async (logs) => {
     try {
-      console.log(logs);
+      // console.log(logs);
       const formattedLogs = logs.map(formatLog);
       console.log(formattedLogs);
       await AuditLog.insertMany(formattedLogs);
